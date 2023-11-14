@@ -1,0 +1,17 @@
+﻿<Page x:Class="InteractiveShortestPathAlgorithms.AStar"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:InteractiveShortestPathAlgorithms"
+      mc:Ignorable="d" 
+      d:DesignHeight="1000" d:DesignWidth="1260"
+      Title="AStar">
+
+    <Grid Name="AStarGrid">
+        <Button x:Name="btnBackToHomePage" Content="Go Back!" HorizontalAlignment="Left" Height="50" Margin="681,10,0,0" VerticalAlignment="Top" Width="250" Click="btnBackToHomePage_Click"/>
+        <Label x:Name="lblAHeader" Content="A*" HorizontalAlignment="Left" Margin="350,10,0,0" VerticalAlignment="Top" Height="50" Width="312" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="36"/>
+        <Button Content="Perform Algorithm" HorizontalAlignment="Left" Height="50" Margin="10,10,0,0" VerticalAlignment="Top" Width="153" Click="btnPerform_Algorithm_Click"/>
+    </Grid>
+
+</Page>
