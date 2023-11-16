@@ -32,6 +32,7 @@ namespace InteractiveShortestPathAlgorithms
                 if (points[i].GetPointStartPointState())
                 {
                     nodes[i].currentscore = 0;
+                    nodes[i].heuristicScore = 0;
                 }
 
             }

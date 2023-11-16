@@ -17,7 +17,7 @@ namespace InteractiveShortestPathAlgorithms
         public byte Alpha { get; }
     }
 
-    internal class gridPoint
+    internal class gridPoint // for mapping to screen
     {
         [Flags]
         public enum PointState // empty = 0x00000000, selected = 0x00001111, discared = 0x11110000, blocked = 0x11111111, st
