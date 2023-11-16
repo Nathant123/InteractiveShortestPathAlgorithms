@@ -8,8 +8,9 @@
       d:DesignHeight="1000" d:DesignWidth="1260"
       Title="Dijkstra">
     <Grid Name="DijkstaGrid">
-        <Button x:Name="btnBackToHomePage" Content="Go Back!" HorizontalAlignment="Left" Height="50" Margin="681,10,0,0" VerticalAlignment="Top" Width="250" Click="btnBackToHomePage_Click"/>
-        <Label x:Name="lblAHeader" Content="Dijkstra" HorizontalAlignment="Left" Margin="350,10,0,0" VerticalAlignment="Top" Height="50" Width="312" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="36"/>
+        <Button x:Name="btnBackToHomePage" Content="Go Back!" HorizontalAlignment="Left" Height="50" Margin="1000,10,0,0" VerticalAlignment="Top" Width="250" Click="btnBackToHomePage_Click"/>
+        <Label x:Name="lblAHeader" Content="Dijkstra" HorizontalAlignment="Left" Margin="350,10,0,0" VerticalAlignment="Top" Height="60" Width="312" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="36"/>
         <Button Content="Perform Algorithm" HorizontalAlignment="Left" Height="50" Margin="10,10,0,0" VerticalAlignment="Top" Width="153" Click="btnPerform_Algorithm_Click"/>
+        <Button x:Name="btnResetGrid" Content="ResetGrid" HorizontalAlignment="Left" Height="50" Margin="724,10,0,0" VerticalAlignment="Top" Width="242" Click="btnResetGrid_Click"/>
     </Grid>
 </Page>

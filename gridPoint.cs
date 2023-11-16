@@ -75,8 +75,6 @@ namespace InteractiveShortestPathAlgorithms
             }
             
             _state = newState;
-        }
-        
+        }     
     }
-
 }

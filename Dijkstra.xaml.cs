@@ -3,12 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 
 //namespace Aliases for more descriptive code
-using SDColor = System.Drawing.Color;
-using SWMColor = System.Windows.Media.Color;
 using Shapes = System.Windows.Shapes;
-using System.Windows.Shapes;
 using System.Windows.Input;
 using System;
+
+// TO:DO clear screen
 
 namespace InteractiveShortestPathAlgorithms
 {
@@ -20,13 +19,11 @@ namespace InteractiveShortestPathAlgorithms
         static Canvas DijkstraCanvas;
         static List<gridPoint> dPoints;
         static List<Shapes.Rectangle> dShapes;
-        
 
         public Dijkstra()
         {
             InitializeComponent();
             IntializeCanvas();
-            
         }
 
         public void IntializeCanvas()
@@ -65,6 +62,34 @@ namespace InteractiveShortestPathAlgorithms
             DijkstraAlgorithm(nodes);
             UpdateCanvas();
         }
+        private void btnResetGrid_Click(object sender, RoutedEventArgs e)
+        {
+            dPoints = PointHandler.resetPointsState(dPoints);
+            UpdateCanvas();
+        }
+
+        public static void CanvasMouseLeftButtonDownClick(object sender, MouseButtonEventArgs e) // sets square to blocked
+        {
+            // Handle the mouse click here
+
+            Point clickPosition = e.GetPosition(DijkstraCanvas);
+
+            if (PointHandler.containsStartNode(dPoints) == false)
+                PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.StartPoint);
+            else if (PointHandler.containsEndNode(dPoints) == false)
+                PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.EndPoint);
+            else PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.Blocked);
+
+            UpdateCanvas();
+        }
+
+        public static void CanvasMouseRightButtonDownClick(object sender, MouseButtonEventArgs e)
+        {
+            // Handle the mouse click here
+            Point clickPosition = e.GetPosition(DijkstraCanvas);
+            PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.Empty);
+            UpdateCanvas();
+        }
 
         private void DijkstraAlgorithm(List<Node> nodes)
         {
@@ -83,10 +108,7 @@ namespace InteractiveShortestPathAlgorithms
                     UnivistedSet.Add(node);
                 }
             }
-            // https://www.baeldung.com/cs/dijkstra for flowchart of algorithm
-
             
-            // do iterations until solved or not solved
             while(solved == false)
             {
                 var currentNode = GetCurrentNode(UnivistedSet);
@@ -100,7 +122,7 @@ namespace InteractiveShortestPathAlgorithms
 
                 if(solved == true)
                 {
-                    var Path = generatePath(VisitedSet);
+                    var Path = generatePathCandidates(VisitedSet);
                     Path = selectPath(Path);
 
                     NodeHandler.dMapNodesToPoints(dPoints, VisitedSet);
@@ -122,11 +144,10 @@ namespace InteractiveShortestPathAlgorithms
                 NodeHandler.dMapNodesToPoints(dPoints, VisitedSet);
                 UpdateCanvas();
             }
-            
             Console.WriteLine();
         }
 
-        private List<Node> generatePath(List<Node> visitedSet)
+        private List<Node> generatePathCandidates(List<Node> visitedSet)
         {
             var Path = new List<Node>();
             foreach(Node node in visitedSet)
@@ -139,9 +160,52 @@ namespace InteractiveShortestPathAlgorithms
 
         private List<Node> selectPath(List<Node> path)
         {
-            var Path = new List<Node>();
 
-            foreach(Node node in path)
+            bool Completed = false;
+            var leftNode = new Node();
+            var upNode = new Node();
+            var rightNode = new Node();
+            var downNode = new Node();
+
+            Func<Node, Node> generateNeighbour = (currentNode) =>
+            {
+                foreach(Node node in path) // get the neigbouring nodes
+                {
+                    if(node.X == currentNode.X - GlobalProperties.POINTWIDTH && node.Y == currentNode.Y)
+                        leftNode = node;
+                    if (node.X == currentNode.X + GlobalProperties.POINTWIDTH && node.Y == currentNode.Y)
+                        rightNode = node;
+                    if (node.X == currentNode.X && node.Y == currentNode.Y - GlobalProperties.POINTHEIGHT)
+                        downNode = node;
+                    if (node.X == currentNode.X && node.Y == currentNode.Y + GlobalProperties.POINTHEIGHT)
+                        upNode = node;
+                }
+
+                var lowestScore = leftNode;
+                if(rightNode.currentscore < lowestScore.currentscore)
+                    lowestScore = rightNode;
+                if(downNode.currentscore < lowestScore.currentscore)
+                    lowestScore = downNode;
+                if (upNode.currentscore < lowestScore.currentscore)
+                    lowestScore = upNode;
+
+                return lowestScore;
+            };
+
+            var Path = new List<Node>();
+            var currentNode = path[path.Count-1]; // add end node, end node hsould always be last elemt
+            Path.Add(currentNode);
+
+            while(Completed!=true)
+            {
+                currentNode = generateNeighbour(currentNode);
+                Path.Add(currentNode);
+
+                if (currentNode.nodePointStatus == gridPoint.PointState.StartPoint)
+                    Completed = true;
+            }
+
+            foreach(Node node in Path)
             {
                 if(node.nodePointStatus != gridPoint.PointState.StartPoint && node.nodePointStatus != gridPoint.PointState.EndPoint)
                 {
@@ -190,7 +254,6 @@ namespace InteractiveShortestPathAlgorithms
                 if(visitedNode.X == node.X && visitedNode.Y == node.Y)
                     return true;
             }
-
             return false;
         }
 
@@ -207,16 +270,6 @@ namespace InteractiveShortestPathAlgorithms
 
         private List<Node> updateUnvisitedSet(List<Node> nodes,List<Node> neighbours)
         {
-            //// for every neighbour update the corresponding
-            //for (int i = 0; i < neighbours.Count; i++)
-            //{
-            //    foreach(var node in nodes)
-            //    {
-            //        if (neighbours[i].X == node.X && neighbours[i].Y == node.Y) // make sure operating on correct node
-            //            node.currentscore = neighbours[i].currentscore;
-            //    }
-            //}
-
             foreach (var node in nodes)
             {
                 foreach (var neighbor in neighbours)
@@ -232,17 +285,11 @@ namespace InteractiveShortestPathAlgorithms
         }
         private bool CurrentIsEndNode(Node currentNode)
         {
-            if (currentNode.nodePointStatus == gridPoint.PointState.EndPoint)
-                return true;
-            return false;
+            return (currentNode.nodePointStatus == gridPoint.PointState.EndPoint) ? true : false;
         }
         private List<Node> NeighbourCheck(Node currentNode, List<Node> neighbours,double currentNodeCurrentScore)
         {
-            Func<Node,Node,double> CalculateEuclidianDistance = (currentNode, neighbour) =>
-            {
-                var result = Math.Sqrt(Math.Pow((neighbour.X - currentNode.X), 2) + Math.Pow((neighbour.Y - currentNode.Y), 2));
-                return result;
-            };
+            Func<Node,Node,double> CalculateEuclidianDistance = (currentNode, neighbour) => Math.Sqrt(Math.Pow((neighbour.X - currentNode.X), 2) + Math.Pow((neighbour.Y - currentNode.Y), 2));
 
             for (int i = 0; i < neighbours.Count; i++)
             {
@@ -259,7 +306,7 @@ namespace InteractiveShortestPathAlgorithms
             return neighbours;
         }
         
-            private List<Node> RemoveCurrentFromUnivistedSet(List<Node> nodes)
+        private List<Node> RemoveCurrentFromUnivistedSet(List<Node> nodes)
         {
             foreach(var node in nodes)
             {
@@ -283,7 +330,6 @@ namespace InteractiveShortestPathAlgorithms
             throw new ArgumentException("No Current Node");
         }
 
-        // get un
         private List<Node> GetUnvisitedNeighbours(Node current,List<Node> nodes)
         {
             var neighbours = new List<Node>();
@@ -304,34 +350,6 @@ namespace InteractiveShortestPathAlgorithms
                     neighbours.Add(node);
             }
             return neighbours;
-        }
-
-
-        public static void CanvasMouseLeftButtonDownClick(object sender, MouseButtonEventArgs e) // sets square to blocked
-        {
-            // Handle the mouse click here
-            //DijkstraCanvas = (Canvas)sender;
-            Point clickPosition = e.GetPosition(DijkstraCanvas);
-
-
-            if (PointHandler.containsStartNode(dPoints) == false)
-                PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.StartPoint);
-            else if (PointHandler.containsEndNode(dPoints) == false)
-                PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.EndPoint);
-            else PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.Blocked);
-
-
-            UpdateCanvas();
-        }
-
-        public static void CanvasMouseRightButtonDownClick(object sender, MouseButtonEventArgs e)
-        {
-            // Handle the mouse click here
-            
-
-            Point clickPosition = e.GetPosition(DijkstraCanvas);
-            PointHandler.ChangePointState(dPoints, clickPosition, gridPoint.PointState.Empty);
-            UpdateCanvas();
         }
     }
 }

@@ -49,7 +49,7 @@ namespace InteractiveShortestPathAlgorithms
                     if(node.X == points[i].GetX() && node.Y == points[i].GetY())
                     {
                         Point clickPosition = new Point(points[i].GetX(), points[i].GetY());
-                        if (node.GetCurrentNode() == true
+                        if (node.nodePointStatus == gridPoint.PointState.Selected
                          && node.nodePointStatus != gridPoint.PointState.EndPoint &&
                          node.nodePointStatus != gridPoint.PointState.StartPoint)
                         {

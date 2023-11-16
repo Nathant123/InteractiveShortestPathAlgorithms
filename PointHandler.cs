@@ -14,11 +14,6 @@ namespace InteractiveShortestPathAlgorithms
 {
     internal class PointHandler
     {
-        public PointHandler() 
-        {
-            
-        }
-
         public static List<gridPoint> GetPoints()// default point list, with default values
         {
             List<gridPoint> points = new List<gridPoint>();
@@ -64,6 +59,16 @@ namespace InteractiveShortestPathAlgorithms
                     }
                     break;
                 }
+            }
+            return points;
+        }
+
+        public static List<gridPoint> resetPointsState(List<gridPoint> points)
+        {
+            foreach (gridPoint p in points)
+            {
+                p.SetPointState(PointState.Empty);
+                p.updateColor(GlobalProperties.EMPTYCOLOR);
             }
             return points;
         }
